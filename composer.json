@@ -12,7 +12,7 @@
             "email": "miklos@geyer-online.de"
         }
     ],
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "autoload": {
         "psr-0": {
             "MiklosGeyer\\YamlFormBuilder\\": "src/"
