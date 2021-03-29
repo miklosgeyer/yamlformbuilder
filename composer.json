@@ -1,11 +1,13 @@
 {
     "name": "miklosgeyer/yamlformbuilder",
     "description": "Builds Symfony forms based on yaml-Files",
+    "type": "library",
     "require": {
         "php": ">=7.1",
         "symfony/form": "5.2.*",
         "symfony/yaml": "5.2.*"
     },
+    "license": "MIT",
     "authors": [
         {
             "name": "miklos",
@@ -14,7 +16,7 @@
     ],
     "minimum-stability": "stable",
     "autoload": {
-        "psr-0": {
+        "psr-4": {
             "MiklosGeyer\\YamlFormBuilder\\": "src/"
         }
     }
