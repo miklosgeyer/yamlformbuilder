@@ -48,6 +48,10 @@ class YamlFormBuilder extends AbstractType
         return $groups;
     }
 
+    /**
+     * Filtert Constraintgroups, wenn es Bedingungen gibt, dass die constraints nicht angewendet werden sollen.
+     * @param $groups
+     */
     private function filterGroups(&$groups){
         foreach($this->definition['conditionalConstraints'] as $key => $conditions){
             $logic = key($conditions); # and oder or
@@ -98,7 +102,10 @@ class YamlFormBuilder extends AbstractType
      * @return bool
      */
     private function notblank($checkvalue,$formvalue){
-        if($formvalue != null && $formvalue != ''){
+        if(is_array($formvalue) && count($formvalue) != 0){
+            return true;
+        }
+        if($formvalue != null && $formvalue != '' && $formvalue != false){
             return true;
         }
         return false;
@@ -112,7 +119,7 @@ class YamlFormBuilder extends AbstractType
      */
     private function equals($checkvalue,$formvalue){
         if(is_array($formvalue)){
-            if(in_array($checkvalue, $formvalue)){
+            if($checkvalue == $formvalue){
                 return true;
             }
             return false;
@@ -124,37 +131,149 @@ class YamlFormBuilder extends AbstractType
         return false;
     }
     /**
-     * Größer als
+     * Checkbox angeklickt
+     * @param $checkvalue
+     * @param $formvalue
+     * @return bool
+     */
+    private function checked($checkvalue,$formvalue){
+        if( $formvalue == true ){
+            return true;
+        }
+        return false;
+
+    }
+    /**
+     * Checkbox nicht angeklickt
+     * @param $checkvalue
+     * @param $formvalue
+     * @return bool
+     */
+    private function unchecked($checkvalue,$formvalue){
+        if( $formvalue == false ){
+            return true;
+        }
+        return false;
+
+    }
+
+
+    /**
+     * Mehr elemente gewählt als
      * @param $checkvalue
      * @param $formvalue
      * @return bool
      */
     private function more($checkvalue,$formvalue){
+        # Array: Anzahl der Elemente
         if(is_array($formvalue)){
+            if(count($formvalue)>$checkvalue){
+                return true;
+            }
             return false;
         }
-        if($formvalue > $checkvalue ){
-            return true;
-        }
         return false;
+
     }
+
     /**
-     * Kleiner als
+     * weniger ausgewählt als
      * @param $checkvalue
      * @param $formvalue
      * @return bool
      */
     private function less($checkvalue,$formvalue){
         if(is_array($formvalue)){
+            if(count($formvalue) < $checkvalue){
+                return true;
+            }
             return false;
         }
-        if($formvalue < $checkvalue ){
-            return true;
+        return false;
+    }
+    /**
+     * Genau Anzahl Optionen ausgewählt
+     * @param $checkvalue
+     * @param $formvalue
+     * @return bool
+     */
+    private function exact($checkvalue,$formvalue){
+        if(is_array($formvalue)){
+            if(count($formvalue) == $checkvalue){
+                return true;
+            }
+            return false;
+        }
+        return false;
+    }
+    /**
+     * String: länger als
+     * @param $checkvalue
+     * @param $formvalue
+     * @return bool
+     */
+    private function longer($checkvalue,$formvalue){
+        if(is_string($formvalue)){
+            if(strlen($formvalue) > $checkvalue){
+                return true;
+            }
+            return false;
         }
         return false;
     }
 
+    /**
+     * String: kürzer als
+     * @param $checkvalue
+     * @param $formvalue
+     * @return bool
+     */
+    private function shorter($checkvalue,$formvalue){
+        if(is_string($formvalue)){
+            if(strlen($formvalue) < $checkvalue){
+                return true;
+            }
+            return false;
+        }
+        return false;
+    }
 
+    /**
+     * Integer größer als
+     * @param $checkvalue
+     * @param $formvalue
+     * @return bool
+     */
+    private function bigger($checkvalue,$formvalue){
+        if(is_numeric($formvalue)){
+            if($formvalue > $checkvalue){
+                return true;
+            }
+            return false;
+        }
+        return false;
+    }
+
+    /**
+     * Integer kleiner als
+     * @param $checkvalue
+     * @param $formvalue
+     * @return bool
+     */
+    private function smaller($checkvalue,$formvalue){
+        if(is_numeric($formvalue)){
+            if($formvalue < $checkvalue){
+                return true;
+            }
+            return false;
+        }
+        return false;
+    }
+
+    /**
+     * Holt alle Constraint-Groups aus der Definition
+     * @return array
+     */
     private function findAllContraintGroups(){
         $groups = [];
         foreach($this->definition['formfields'] as $field){
@@ -175,7 +294,7 @@ class YamlFormBuilder extends AbstractType
         $yamlconfig = $options['yamlconfig'];
         $this->definition = $this->parseYamlConfig($yamlconfig);
 
-        # Create Filds
+        # Create Fields
         foreach($this->definition['formfields'] as $key => $formfield){
             $formtype = $formfield['fieldtype'];
             $methodName = 'add' . $formtype;
