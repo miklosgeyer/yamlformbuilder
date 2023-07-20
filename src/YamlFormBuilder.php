@@ -18,7 +18,6 @@ class YamlFormBuilder extends AbstractType
 {
 
     private $definition;
-    //private $options;
     private $form;
 
     public function configureOptions(OptionsResolver $resolver)
