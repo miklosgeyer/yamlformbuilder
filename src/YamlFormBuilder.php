@@ -86,6 +86,7 @@ class YamlFormBuilder extends AbstractType
         $results = [];
         foreach($conditions as $item){
             $check = $item['constraint'];
+            if(!method_exists($this,$check)){ continue;}
             $checkvalue = $item['value'];
             $formvalue = $this->form->get($item['target'])->getData();
             $results[] = $this->$check($checkvalue,$formvalue);
@@ -105,6 +106,23 @@ class YamlFormBuilder extends AbstractType
             return true;
         }
         if($formvalue != null && $formvalue != '' && $formvalue != false){
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * leer
+     *
+     * @param $checkvalue
+     * @param $formvalue
+     * @return bool
+     */
+    private function blank($checkvalue,$formvalue){
+        if(is_array($formvalue) && count($formvalue) == 0){
+            return true;
+        }
+        if($formvalue == null || $formvalue == '' || $formvalue == false){
             return true;
         }
         return false;
@@ -154,6 +172,58 @@ class YamlFormBuilder extends AbstractType
         }
         return false;
 
+    }
+
+    /**
+     * Keine Checkboxen angeklickt (multiple)
+     * @param $checkvalue
+     * @param $formvalue
+     * @return bool
+     */
+    private function notchecked($checkvalue,$formvalue){
+        if( count($formvalue) == 0 ){
+            return true;
+        }
+        return false;
+
+    }
+
+    /**
+     * irgendwelche Checkboxen angeklickt (multiple)
+     * @param $checkvalue
+     * @param $formvalue
+     * @return bool
+     */
+    private function somechecked($checkvalue,$formvalue){
+        if( count($formvalue) > 0 ){
+            return true;
+        }
+        return false;
+
+    }
+
+    /**
+     * Kein Radiobutton gewählt
+     * @param $checkvalue
+     * @param $formvalue
+     * @return bool
+     */
+    private function notselected($checkvalue,$formvalue){
+        if( $formvalue == '' ||  $formvalue == null ){
+            return true;
+        }
+        return false;
+
+    }
+
+    /**
+     * Radiobutton gewählt
+     * @param $checkvalue
+     * @param $formvalue
+     * @return bool
+     */
+    private function selected($checkvalue,$formvalue){
+        return $this->notblank($checkvalue,$formvalue);
     }
 
 
